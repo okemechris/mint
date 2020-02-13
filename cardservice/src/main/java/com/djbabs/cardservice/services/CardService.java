@@ -44,7 +44,7 @@ public class CardService {
 	public Card save(Card card) {
 
 		return cardRepository.save(card);
-		
+
 	}
 
 	public Card getCardDetails(String number) throws JsonMappingException, JsonProcessingException {
@@ -54,7 +54,16 @@ public class CardService {
 		if (card != null)
 			return card;
 
-		ResponseEntity<String> response = dataProvider.verifyCard(number);
+		ResponseEntity<String> response = null;
+
+		try {
+
+			response = dataProvider.verifyCard(number);
+
+		} catch (Exception e) {
+
+			return null;
+		}
 
 		if (!response.getStatusCode().equals(HttpStatus.OK))
 			return null;
