@@ -1,15 +1,16 @@
 package com.djbabs.cardservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.djbabs.cardservice.entities.Card;
-import com.djbabs.cardservice.pojo.GenericResponse;
+import com.djbabs.cardservice.entities.Hit;
+import com.djbabs.cardservice.pojo.HitResponse;
 import com.djbabs.cardservice.services.HitService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 @RestController
 @RequestMapping(path = "api")
@@ -20,20 +21,22 @@ public class HitController {
 	
 	
 	@GetMapping("/card-scheme/stats")
-    public GenericResponse getHits(@PathVariable String cardNumber) {
+    public HitResponse getHits(@RequestParam("start") int start, @RequestParam("limit") int limit ) {
 		
-		Card card = null;
+		Page<Hit> page =  hitService.findAll(PageRequest.of(start,limit));
 		
-        try {
-			card =  cardService.getCardDetails(cardNumber);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		HitResponse response = new HitResponse();
+		
+		response.setSuccess(true);
+		response.setLimit(limit);
+		response.setSize(page.getSize());
+		response.setStart(start);
+		
+		for(Hit h : page.getContent()) {
+			response.getPayload().put(h.getCardNumber(), h.getCount());
 		}
-       
-       return new GenericResponse(card == null, card);
         
-        
+        return response;
     }
 	
 }
