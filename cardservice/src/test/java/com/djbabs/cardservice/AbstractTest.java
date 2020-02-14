@@ -2,6 +2,7 @@ package com.djbabs.cardservice;
 
 import java.io.IOException;
 
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,13 +21,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SpringBootTest(classes = CardserviceApplication.class)
 @WebAppConfiguration
 public abstract class AbstractTest {
+	
    protected MockMvc mvc;
    
    @Autowired
    WebApplicationContext webApplicationContext;
 
+   @Before
    protected void setUp() {
       mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+      
    }
    protected String mapToJson(Object obj) throws JsonProcessingException {
       ObjectMapper objectMapper = new ObjectMapper();
