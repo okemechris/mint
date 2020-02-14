@@ -33,6 +33,7 @@ public class Card implements Serializable{/**
 	private Long id;
 	@Column(unique = true)
 	private String number;
+	private boolean hasData;
 	private String scheme;
 	private String type;
 	private String bank;

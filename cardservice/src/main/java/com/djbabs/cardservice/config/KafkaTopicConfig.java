@@ -15,6 +15,8 @@ public class KafkaTopicConfig {
      
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private  String bootstrapAddress;
+	@Value(value = "${card.kafka.topic}")
+	private String topic;
  
     @Bean
     public KafkaAdmin kafkaAdmin() {
@@ -25,6 +27,6 @@ public class KafkaTopicConfig {
      
     @Bean
     public NewTopic cardsTopic() {
-         return new NewTopic("com.ng.vela.even.card_verified", 1, (short) 1);
+         return new NewTopic(topic, 1, (short) 1);
     }
 }

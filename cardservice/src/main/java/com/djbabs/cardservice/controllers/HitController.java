@@ -13,14 +13,14 @@ import com.djbabs.cardservice.pojo.HitResponse;
 import com.djbabs.cardservice.services.HitService;
 
 @RestController
-@RequestMapping(path = "api")
+@RequestMapping(path = "card-scheme")
 public class HitController {
 
 	@Autowired
 	private HitService hitService;
 	
 	
-	@GetMapping("/card-scheme/stats")
+	@GetMapping("/stats")
     public HitResponse getHits(@RequestParam("start") int start, @RequestParam("limit") int limit ) {
 		
 		Page<Hit> page =  hitService.findAll(PageRequest.of(start,limit));
@@ -29,7 +29,7 @@ public class HitController {
 		
 		response.setSuccess(true);
 		response.setLimit(limit);
-		response.setSize(page.getSize());
+		response.setSize(page.getTotalPages());
 		response.setStart(start);
 		
 		for(Hit h : page.getContent()) {

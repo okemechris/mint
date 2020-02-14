@@ -22,14 +22,14 @@ public class CardControllerTests extends AbstractTest {
 	@Test
 	public void cardNotFound() throws Exception {
 		
-		mvc.perform(MockMvcRequestBuilders.get("/api/card-scheme/verify/123456xxx")).andExpect(status().isOk())
+		mvc.perform(MockMvcRequestBuilders.get("/card-scheme/verify/123456xxx")).andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(false));
 	}
 
 	@Test
 	public void cardFound() throws Exception {
 		
-		mvc.perform(MockMvcRequestBuilders.get("/api/card-scheme/verify/45717360")).andExpect(status().isOk())
+		mvc.perform(MockMvcRequestBuilders.get("/card-scheme/verify/45717360")).andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(true));
 	}
 	

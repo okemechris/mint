@@ -27,7 +27,7 @@ public class HitControllerTests extends AbstractTest {
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("start", "1");
 		params.add("limit", "20");
-		mvc.perform(MockMvcRequestBuilders.get("/api/card-scheme/stats").queryParams(params)).andExpect(status().isOk())
+		mvc.perform(MockMvcRequestBuilders.get("/card-scheme/stats").queryParams(params)).andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.success").value(true));
 	}
 

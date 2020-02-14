@@ -1,6 +1,7 @@
 package com.djbabs.cardservice.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +18,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-@RequestMapping(path = "api")
+@RequestMapping(path = "card-scheme")
 public class CardController {
 
+	@Value(value = "${card.kafka.topic}")
+	private String topic;
+	
 	@Autowired
 	private CardService cardService;
 
@@ -31,33 +35,43 @@ public class CardController {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	@GetMapping("/card-scheme/verify/{cardNumber}")
+	@GetMapping("/verify/{cardNumber}")
 	public GenericResponse veryCard(@PathVariable String cardNumber) {
 
 		Card card = null;
 		CardMessage message = new CardMessage();
-		
+
 		try {
 			card = cardService.getCardDetails(cardNumber);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		doCardJob(card,message,cardNumber);
 
-		// save or update hit
+		return new GenericResponse(card != null, message);
+
+	}
+
+	void doCardJob(Card card, CardMessage message, String cardNumber) {
+		
 		if (card != null) {
 
 			Hit hit = hitService.findByCardNumber(cardNumber).orElse(null);
 
 			if (hit != null) {
-
-				hit.setCount(hit.getCount() + 1);
+				// if its valid increase count
+				if (card.isHasData())
+					hit.setCount(hit.getCount() + 1);
 
 			} else {
 
 				hit = new Hit();
 				hit.setCardNumber(cardNumber);
-				hit.setCount(1);
+				// if its valid increase count
+				if (card.isHasData())
+					hit.setCount(1);
 			}
 
 			hitService.save(hit);
@@ -68,14 +82,12 @@ public class CardController {
 			message.setType(card.getType());
 
 			try {
-				kafkaTemplate.send("com.ng.vela.even.card_verified", objectMapper.writeValueAsString(message));
+				kafkaTemplate.send(topic, objectMapper.writeValueAsString(message));
 			} catch (JsonProcessingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-
-		return new GenericResponse(card != null, message);
 
 	}
 

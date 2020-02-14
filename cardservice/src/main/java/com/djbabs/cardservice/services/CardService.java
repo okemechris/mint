@@ -3,9 +3,9 @@ package com.djbabs.cardservice.services;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import com.djbabs.cardservice.entities.Card;
 import com.djbabs.cardservice.interfaces.CardDataProvider;
@@ -60,13 +60,23 @@ public class CardService {
 
 			response = dataProvider.verifyCard(number);
 
-		} catch (Exception e) {
+		} catch (HttpStatusCodeException exception) {
+
+			// check if response is not found and save card details any ways
+			if (exception.getStatusCode().value() == 404) {
+				card = new Card();
+				card.setNumber(number);
+				card.setHasData(false);
+				card.setScheme(null);
+				card.setType(null);
+				card.setBank(null);
+
+				return save(card);
+
+			}
 
 			return null;
 		}
-
-		if (!response.getStatusCode().equals(HttpStatus.OK))
-			return null;
 
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode root = mapper.readTree(response.getBody());
@@ -80,6 +90,7 @@ public class CardService {
 		card.setNumber(number);
 		card.setScheme(scheme.textValue());
 		card.setType(type.textValue());
+		card.setHasData(true);
 		card.setBank(bankName.textValue());
 
 		return save(card);
