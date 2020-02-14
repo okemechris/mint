@@ -1,5 +1,6 @@
 FROM openjdk:8-jdk-alpine
 ARG KAFKA_ADDRESSES=127.0.0.1:9092
+ENV KAFKA_ADDRESSES=$KAFKA_ADDRESSES
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]

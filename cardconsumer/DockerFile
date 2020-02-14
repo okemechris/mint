@@ -1,5 +1,6 @@
 FROM openjdk:8-jdk-alpine
-ARG BASE_URL=
+ARG BASE_URL
+ENV BASE_URL=$BASE_URL
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
 ENTRYPOINT ["java","-jar","/app.jar"]
